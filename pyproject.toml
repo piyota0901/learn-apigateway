@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "demo-apigateway"
+version = "0.1.0"
+description = ""
+authors = ["piyota0901 <piyo.tatsu.0901@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+sqlalchemy = "^2.0.27"
+python-dotenv = "^1.0.1"
+alembic = "^1.13.1"
+
+
+[tool.poetry.group.backend1.dependencies]
+fastapi = "^0.109.2"
+uvicorn = {extras = ["standard"], version = "^0.27.1"}
+
+
+[tool.poetry.group.backend2.dependencies]
+flask = "^3.0.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,46 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  GREETING: Hello, World!
+
+tasks:
+  default:
+    cmds:
+      - echo "{{.GREETING}}"
+    silent: true
+  
+  clean:
+    cmds:
+      - find . -type d -name __pycache__ -exec rm -r {} +
+    silent: true
+
+  run-backend1:
+    cmds:
+      - cd backend1 && poetry run uvicorn main:app --reload
+    silent: true
+  
+  backend1:auto-migrate:
+    vars:
+      MESSAGE:
+    cmds:
+      - cd backend1 && poetry run alembic revision --autogenerate -m "{{.MESSAGE}}"
+    silent: true
+  
+  backend1:create-migration:
+    vars:
+      MESSAGE:
+    cmds:
+      - cd backend1 && poetry run alembic revision -m "{{.MESSAGE}}"
+    silent: true
+  
+  backend1:migrate:
+    cmds:
+      - cd backend1 && poetry run alembic upgrade head
+    silent: true
+  
+  backend1:rollback:
+    cmds:
+      - cd backend1 && poetry run alembic downgrade -1
+    silent: true
