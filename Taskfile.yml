@@ -16,9 +16,9 @@ tasks:
       - find . -type d -name __pycache__ -exec rm -r {} +
     silent: true
 
-  run-backend1:
+  run:orders:
     cmds:
-      - cd backend1 && poetry run uvicorn main:app --reload
+      - cd orders && poetry run uvicorn app:app --reload
     silent: true
   
   backend1:auto-migrate:
