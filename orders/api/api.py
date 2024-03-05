@@ -1,6 +1,8 @@
 from datetime import datetime
 from uuid import UUID
+import uuid
 
+from fastapi import HTTPException
 from starlette.responses import Response
 from starlette import status
 
@@ -8,24 +10,11 @@ from app import app
 from api.schemas import CreateOrderSchema, GetOrderSchema, GetOrdersSchema
 
 
-orders = [
-            {
-                'id': 'a173fb93-ef2a-468d-aa92-240de4fac896',
-                'status': "delivered",
-                'created': datetime.utcnow(),
-                "order": [
-                    {
-                        'product': 'cappuccino',
-                        'size': 'medium',
-                        'quantity': 1,
-                    }
-                ]
-            }
-        ]
+ORDERS = []
 
 @app.get("/orders", response_model=GetOrdersSchema)
 def get_orders():
-    return {"orders": orders}
+    return {"orders": ORDERS}
 
 @app.post(
     "/orders", 
@@ -33,24 +22,82 @@ def get_orders():
     response_model=GetOrderSchema
     )
 def create_order(order_details: CreateOrderSchema):
-    return orders
+    order = order_details.dict()
+    order["id"] = uuid.uuid4()
+    order["created"] = datetime.utcnow()
+    order["status"] = "created"
+    ORDERS.append(order)
+    return order
 
-@app.get("/orders/{order_id}")
+@app.get("/orders/{order_id}", response_model=GetOrderSchema)
 def get_order(order_id: UUID):
-    return orders
+    # ORDERSからorder_idに一致するものを取得
+    result = filter(lambda order: order["id"] == order_id, ORDERS)
+    order = next(result, None)
+    
+    if order is None:
+        raise HTTPException(
+            status_code=404, detail=f"Order with ID {order_id} not found."
+            )
+    
+    return order
 
-@app.put("/orders/{order_id}")
+@app.put("/orders/{order_id}", response_model=GetOrderSchema)
 def update_order(order_id: UUID, order_details: CreateOrderSchema):
-    return orders
+    # ORDERSからorder_idに一致するものを取得
+    result = filter(lambda order: order["id"] == order_id, ORDERS)
+    order = next(result, None)
+    
+    if order is None:
+        raise HTTPException(
+            status_code=404, detail=f"Order with ID {order_id} not found."
+            )
+    
+    order.update(order_details.model_dump())
+    return order
 
-@app.delete("/orders/{order_id}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete(
+    "/orders/{order_id}", 
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response
+)
 def delete_order(order_id: UUID):
-    return Response(status_code=status.HTTP_204_NO_CONTENT.value)
+    # ORDERSからorder_idに一致するものを取得
+    result = filter(lambda order: order["id"] == order_id, ORDERS)
+    order = next(result, None)
+    
+    if order is None:
+        raise HTTPException(
+            status_code=404, detail=f"Order with ID {order_id} not found."
+            )
+    
+    ORDERS.remove(order)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-@app.post("/orders/{order_id}/cancel")
+@app.post("/orders/{order_id}/cancel", response_model=GetOrderSchema)
 def cancel_order(order_id: UUID):
-    return orders
+    # ORDERSからorder_idに一致するものを取得
+    result = filter(lambda order: order["id"] == order_id, ORDERS)
+    order = next(result, None)
+    
+    if order is None:
+        raise HTTPException(
+            status_code=404, detail=f"Order with ID {order_id} not found."
+            )
+    
+    order["status"] = "cancelled"
+    return order
 
-@app.post("/orders/{order_id}/pay")
+@app.post("/orders/{order_id}/pay", response_model=GetOrderSchema)
 def pay_order(order_id: UUID):
-    return orders
+    # ORDERSからorder_idに一致するものを取得
+    result = filter(lambda order: order["id"] == order_id, ORDERS)
+    order = next(result, None)
+    
+    if order is None:
+        raise HTTPException(
+            status_code=404, detail=f"Order with ID {order_id} not found."
+            )
+    
+    order["status"] = "paid"
+    return order
