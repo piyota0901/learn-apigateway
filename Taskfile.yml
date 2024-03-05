@@ -1,6 +1,6 @@
 # https://taskfile.dev
 
-version: '3'
+version: "3"
 
 vars:
   GREETING: Hello, World!
@@ -10,37 +10,27 @@ tasks:
     cmds:
       - echo "{{.GREETING}}"
     silent: true
-  
+
   clean:
+    description: Remove all __pycache__ directories
     cmds:
       - find . -type d -name __pycache__ -exec rm -r {} +
     silent: true
 
   run:orders:
+    description: Run the orders service
     cmds:
       - cd orders && poetry run uvicorn app:app --reload
     silent: true
-  
-  backend1:auto-migrate:
-    vars:
-      MESSAGE:
+
+  run:swagger-editor:
+    description: Run the swagger service
     cmds:
-      - cd backend1 && poetry run alembic revision --autogenerate -m "{{.MESSAGE}}"
+      - docker run -p 80:8080 -v $(pwd):/tmp -e SWAGGER_FILE=/tmp/oas.yaml swaggerapi/swagger-editor
     silent: true
-  
-  backend1:create-migration:
-    vars:
-      MESSAGE:
+
+  run:prism:
+    description: Run the prism service
     cmds:
-      - cd backend1 && poetry run alembic revision -m "{{.MESSAGE}}"
-    silent: true
-  
-  backend1:migrate:
-    cmds:
-      - cd backend1 && poetry run alembic upgrade head
-    silent: true
-  
-  backend1:rollback:
-    cmds:
-      - cd backend1 && poetry run alembic downgrade -1
+      - docker run --init --rm -v $(pwd):/tmp -p 4010:4010 stoplight/prism:4 mock -h 0.0.0.0 "/tmp/oas.yaml"
     silent: true

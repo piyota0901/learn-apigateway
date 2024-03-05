@@ -1,11 +1,10 @@
-openapi: "3.0.2"
+openapi: 3.0.2
 info:
   title: API Title
-  version: "1.0"
+  version: '1.0'
 servers:
   - url: http://localhost:8000
     description: Development server
-
 paths:
   /orders:
     get:
@@ -21,8 +20,36 @@ paths:
           schema:
             type: integer
       responses:
-        "200":
-          description: OK
+        '200':
+          description: A JSON array of orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GetOrderSchema'
+              examples:
+                example1:
+                  value: |-
+                    {
+                      "orders": [
+                        {
+                          "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                          "created": "2024-03-05T12:53:29.935Z",
+                          "status": "created",
+                          "order": [
+                            {
+                              "product": "string",
+                              "size": "small",
+                              "quantity": 1
+                            }
+                          ]
+                        }
+                      ]
+                    }
     post:
       summary: Creates an order
       operationId: createOrder
@@ -31,15 +58,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateOrderSchema"
+              $ref: '#/components/schemas/CreateOrderSchema'
       responses:
-        "201":
+        '201':
           description: A JSON representation of the created order
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetOrderSchema"
-
+                $ref: '#/components/schemas/GetOrderSchema'
   /orders/{order_id}:
     parameters:
       - in: path
@@ -52,12 +78,12 @@ paths:
       summary: Returns the details of a specific order
       operationId: getOrder
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetOrderSchema"
+                $ref: '#/components/schemas/GetOrderSchema'
     put:
       summary: Replaces an existing order
       operationId: updateOrder
@@ -66,22 +92,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateOrderSchema"
+              $ref: '#/components/schemas/CreateOrderSchema'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetOrderSchema"
-
+                $ref: '#/components/schemas/GetOrderSchema'
     delete:
       summary: Deletes an existing order
       operationId: deleteOrder
       responses:
-        "204":
+        '204':
           description: The resource was deleted successfully
-
   /orders/{order_id}/pay:
     parameters:
       - in: path
@@ -94,13 +118,12 @@ paths:
       summary: Processes payment for an order
       operationId: payOrder
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetOrderSchema"
-
+                $ref: '#/components/schemas/GetOrderSchema'
   /orders/{order_id}/cancel:
     parameters:
       - in: path
@@ -113,20 +136,19 @@ paths:
       summary: Cancels an order
       operationId: cancelOrder
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetOrderSchema"
-
+                $ref: '#/components/schemas/GetOrderSchema'
 components:
   schemas:
     OrderItemSchema:
       type: object
       required:
-        - "product"
-        - "size"
+        - product
+        - size
       properties:
         product:
           type: string
@@ -140,7 +162,6 @@ components:
           type: integer
           default: 1
           minimum: 1
-
     CreateOrderSchema:
       type: object
       required:
@@ -150,8 +171,7 @@ components:
           type: array
           minItems: 1
           items:
-            $ref: "#/components/schemas/OrderItemSchema"
-
+            $ref: '#/components/schemas/OrderItemSchema'
     GetOrderSchema:
       type: object
       required:
@@ -179,4 +199,4 @@ components:
           type: array
           minItems: 1
           items:
-            $ref: "#/components/schemas/OrderItemSchema"
+            $ref: '#/components/schemas/OrderItemSchema'

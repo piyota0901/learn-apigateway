@@ -10,13 +10,13 @@ class Size(Enum):
     medium = "medium"
     large = "large"
 
-class Status(Enum):
+class StatusEnum(Enum):
     created = "created"
     paid = "paid"
     progress = "progress"
     cancelled = "cancelled"
     dispatched = "dispatched"
-    dlivered = "delivered"
+    delivered = "delivered"
 
 class OrderItemSchema(BaseModel):
     product: str
@@ -31,10 +31,10 @@ class OrderItemSchema(BaseModel):
 class CreateOrderSchema(BaseModel):
     order: conlist(OrderItemSchema, min_length=1)
 
-class GetOrderSchema(BaseModel):
+class GetOrderSchema(CreateOrderSchema):
     id: UUID
     created: datetime
-    status: Status
+    status: StatusEnum
 
 class GetOrdersSchema(BaseModel):
     orders: List[GetOrderSchema]
