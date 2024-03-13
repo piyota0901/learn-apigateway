@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from uuid import UUID
 import uuid
 
@@ -13,8 +14,22 @@ from api.schemas import CreateOrderSchema, GetOrderSchema, GetOrdersSchema
 ORDERS = []
 
 @app.get("/orders", response_model=GetOrdersSchema)
-def get_orders():
-    return {"orders": ORDERS}
+def get_orders(cancelled: Optional[bool]=None, limit: Optional[int]=None):
+    if cancelled is None and limit is None:
+        return {"orders": ORDERS}
+    
+    query_set = [order for order in ORDERS]
+    
+    if cancelled is not None:
+        if cancelled:
+            query_set = [order for order in query_set if order["status"] == "cancelled"]
+        else:
+            query_set = [order for order in query_set if order["status"] != "cancelled"]
+    
+    if limit is not None and len(query_set) > limit:
+        return {"orders": query_set[:limit]}
+    
+    return {"orders": query_set}
 
 @app.post(
     "/orders", 
