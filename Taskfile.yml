@@ -12,25 +12,25 @@ tasks:
     silent: true
 
   clean:
-    description: Remove all __pycache__ directories
     cmds:
       - find . -type d -name __pycache__ -exec rm -r {} +
     silent: true
 
   run:orders:
-    description: Run the orders service
     cmds:
       - cd orders && poetry run uvicorn app:app --reload
     silent: true
 
   run:swagger-editor:
-    description: Run the swagger service
     cmds:
       - docker run -p 80:8080 -v $(pwd):/tmp -e SWAGGER_FILE=/tmp/oas.yaml swaggerapi/swagger-editor
     silent: true
 
   run:prism:
-    description: Run the prism service
     cmds:
       - docker run --init --rm -v $(pwd):/tmp -p 4010:4010 stoplight/prism:4 mock -h 0.0.0.0 "/tmp/oas.yaml"
     silent: true
+
+  run:kitchen:
+    cmds:
+      - cd kitchen && poetry run flask run --reload
