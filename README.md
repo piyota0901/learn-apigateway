@@ -18,3 +18,7 @@ Web APIでのマーシャリングでは、オブジェクトの属性を明示�
 - モックサーバー
     - [Prism](https://github.com/stoplightio/prism)
     - [Docker](https://docs.stoplight.io/docs/prism/f51bcc80a02db-installation#docker)
+
+
+## 勉強用
+- [CodeZin | マイクロサービス](https://codezine.jp/article/detail/11305)
