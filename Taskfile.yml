@@ -16,6 +16,11 @@ tasks:
       - find . -type d -name __pycache__ -exec rm -r {} +
     silent: true
 
+  python:
+    cmds:
+      - poetry run python
+    silent: true
+
   run:orders:
     cmds:
       - cd orders && poetry run uvicorn app:app --reload
