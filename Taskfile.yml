@@ -23,7 +23,7 @@ tasks:
 
   run:orders:
     cmds:
-      - cd orders && poetry run uvicorn app:app --reload
+      - poetry run uvicorn orders.Web.app:app --reload
     silent: true
 
   run:swagger-editor:
@@ -31,9 +31,14 @@ tasks:
       - docker run -p 80:8080 -v $(pwd):/tmp -e SWAGGER_FILE=/tmp/oas.yaml swaggerapi/swagger-editor
     silent: true
 
-  run:prism:
+  run:prism:kitchen:
     cmds:
-      - docker run --init --rm -v $(pwd):/tmp -p 4010:4010 stoplight/prism:4 mock -h 0.0.0.0 "/tmp/oas.yaml"
+      - docker run --init -d --rm -v ${PWD}/kitchen:/tmp -p 3000:3000 stoplight/prism:4 mock --port 3000 -h 0.0.0.0 "/tmp/oas.yaml"
+    silent: true
+
+  run:prism:payments:
+    cmds:
+      - docker run --init -d --rm -v ${PWD}/payments:/tmp -p 3001:3001 stoplight/prism:4 mock --port 3001 -h 0.0.0.0 "/tmp/oas.yaml"
     silent: true
 
   run:kitchen:
