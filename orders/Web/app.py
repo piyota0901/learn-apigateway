@@ -14,5 +14,5 @@ oas_doc = yaml.safe_load(
 
 app.openapi = lambda: oas_doc
 
-from api import api
+from orders.Web.api import api
 
