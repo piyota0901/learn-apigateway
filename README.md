@@ -1,3 +1,15 @@
+## 環境セットアップ
+
+### データベースの初期化
+
+`sqlite`の想定。
+
+1. `alembic`でmigrationを実行する
+    ```bash
+    $ cd orders
+    $ poetry run alembic init migrations
+    $ poetry run alembic upgrade heads
+    ```
 
 ## Alembic 
 
@@ -50,3 +62,15 @@ Web APIでのマーシャリングでは、オブジェクトの属性を明示�
 今回は、ビジネス層のドメインの注文を表すオブジェクトを返す。理由は、データベースモデルのインスタンスを返すのが良くないのは  
 ビジネス層をデータ層から切り離すというリポジトリの目的に反しているから。永続化ストレージテクノロジーやORMフレームワークを  
 変更する場合に、`orders/repository/models.py`のクラスは使えなくなる（`sqlalchemy`固有の実装のため）。
+
+### Unit of Workパターン 
+
+トランザクションの原子性を保証するデザインパターン  
+すべてのトランザクションがまとめてコミットされるか、トランザクションが1つでも失敗した場合は  
+すべてのトランザクションがロールバックされるかのどちらかになる
+
+SQLAlcheyｍの`Session`オブジェクトは、データベーストランザクションに対して`Unit of Workパターン`をすでに実装している（[Session Basic](https://docs.sqlalchemy.org/en/20/orm/session_basics.html#:~:text=This%20is%20known%20as%20the%20unit%20of%20work%20pattern.)）。
+
+
+### SQLAlchemy
+- `mapped_column()`は、`nullable=True`としないとデフォルトで`False`が設定されてしまう

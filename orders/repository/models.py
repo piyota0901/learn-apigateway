@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 
 from sqlalchemy import ForeignKey
@@ -23,9 +23,9 @@ class OrderModel(Base):
     id: Mapped[str] = mapped_column(primary_key=True, default=generate_uuid)
     items: Mapped[List["OrderItemModel"]] = relationship(backref="order")
     status: Mapped[str] = mapped_column(nullable=False, default="created")
-    created: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow)
-    schedule_id: Mapped[str] = mapped_column()
-    delivery_id: Mapped[str] = mapped_column()
+    created: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now(timezone.utc))
+    schedule_id: Mapped[str] = mapped_column(nullable=True)
+    delivery_id: Mapped[str] = mapped_column(nullable=True)
     
     def dict(self):
         return {
@@ -42,7 +42,7 @@ class OrderItemModel(Base):
     __tablename__ = "order_item"
     
     id: Mapped[str] = mapped_column(primary_key=True, default=generate_uuid)
-    order_id: Mapped[str] = mapped_column(ForeignKey("order.id"))
+    order_id: Mapped[str] = mapped_column(ForeignKey("order.id"), nullable=True)
     product: Mapped[str] = mapped_column(nullable=False)
     size: Mapped[str] = mapped_column(nullable=False)
     quantity: Mapped[int] = mapped_column(nullable=False)
@@ -50,7 +50,6 @@ class OrderItemModel(Base):
     def dict(self):
         return {
             "id": self.id,
-            "order_id": self.order_id,
             "product": self.product,
             "size": self.size,
             "quantity": self.quantity

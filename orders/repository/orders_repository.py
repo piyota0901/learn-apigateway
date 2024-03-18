@@ -41,15 +41,14 @@ class OrdersRepository:
         return [Order(**record.dict()) for record in records]
     
     
-    def update(self,id_: str, **payload):
+    def update(self, id_, **payload):
         record = self._get(id_)
-        if "items" in payload:
+        if 'items' in payload:
             for item in record.items:
                 self.session.delete(item)
-            record.item = [
-                OrderItemModel(**item) for item in payload.pop("items")
+            record.items = [
+                OrderItemModel(**item) for item in payload.pop('items')
             ]
-        
         for key, value in payload.items():
             setattr(record, key, value)
         return Order(**record.dict())

@@ -29,6 +29,9 @@ def get_orders(cancelled: Optional[bool]=None, limit: Optional[int]=None):
         repo = OrdersRepository(session=uow.session)
         orders_service = OrdersService(orders_repository=repo)
         results = orders_service.list_orders(limit=limit, cancelled=cancelled)
+        
+        for result in results:
+            print("result: ", result.dict())
     return {"orders": [result.dict() for result in results]}
 
 @app.post(
@@ -69,10 +72,10 @@ def update_order(order_id: UUID, order_details: CreateOrderSchema):
         with UnitOfWork() as uow:
             repo = OrdersRepository(session=uow.session)
             orders_service = OrdersService(orders_repository=repo)
-            order = order_details.dict()["order"]
+            order = order_details.model_dump()["order"]
             for item in order:
                 item["size"] = item["size"].value
-            order = orders_service.update_order(order_id, items=order)
+            order = orders_service.update_order(order_id=order_id, items=order)
             uow.commit()
         return order.dict()
     

@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: ae8d6c8e7baa
+Revision ID: 9f0d1a33406c
 Revises: 
-Create Date: 2024-03-17 15:22:03.653585
+Create Date: 2024-03-18 22:41:38.301147
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'ae8d6c8e7baa'
+revision: str = '9f0d1a33406c'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -24,13 +24,13 @@ def upgrade() -> None:
     sa.Column('id', sa.String(), nullable=False),
     sa.Column('status', sa.String(), nullable=False),
     sa.Column('created', sa.DateTime(), nullable=False),
-    sa.Column('schedule_id', sa.String(), nullable=False),
-    sa.Column('delivery_id', sa.String(), nullable=False),
+    sa.Column('schedule_id', sa.String(), nullable=True),
+    sa.Column('delivery_id', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('order_item',
     sa.Column('id', sa.String(), nullable=False),
-    sa.Column('order_id', sa.String(), nullable=False),
+    sa.Column('order_id', sa.String(), nullable=True),
     sa.Column('product', sa.String(), nullable=False),
     sa.Column('size', sa.String(), nullable=False),
     sa.Column('quantity', sa.Integer(), nullable=False),

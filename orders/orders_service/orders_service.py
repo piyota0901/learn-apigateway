@@ -16,24 +16,23 @@ class OrdersService:
         return self.orders_repository.add(items=items)
     
     def get_order(self, order_id: str):
-        order: Order = self.orders_repository.get(order_id=order_id)
+        order: Order = self.orders_repository.get(id_=order_id)
         if order is not None:
             return order
         raise OrderNotFoundError(f"Order with id {order_id} not found")
     
-    def update_order(self, order_id: str, items: list[OrderItemSchema]):
-        order = self.orders_repository.get(order_id=order_id)
-        if order is not None:
-            return self.orders_repository.update(order_id=order_id, items=items)
-        
-        return self.orders_repository.update(order_id, {"items": items})
+    def update_order(self, order_id: str, **payload):
+        order = self.orders_repository.get(id_=order_id)
+        if order is None:
+            raise OrderNotFoundError(f"Order with id {order_id} not found")
+        return self.orders_repository.update(order_id, **payload)
     
     def list_orders(self, **filters):
         limit = filters.pop("limit", None)
         return self.orders_repository.list(limit, **filters)
     
     def pay_order(self, order_id: str):
-        order: Order = self.orders_repository.get(order_id=order_id)
+        order: Order = self.orders_repository.get(id_=order_id)
         if order is None:
             raise OrderNotFoundError(f"Order with id {order_id} not found")
         
@@ -41,7 +40,7 @@ class OrdersService:
         
         schedule_id = order.schedule()
         return self.orders_repository.update(
-            order_id,
+            id_=order_id,
             status="progress",
             schedule_id=schedule_id
         )
@@ -56,7 +55,7 @@ class OrdersService:
     
     
     def delete_order(self, order_id):
-        order = self.orders_repository.get(order_id)
+        order = self.orders_repository.get(id_=order_id)
         if order is None:
             raise OrderNotFoundError(f'Order with id {order_id} not found')
         return self.orders_repository.delete(order_id)

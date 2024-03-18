@@ -9,10 +9,10 @@ from orders.orders_service.exceptions import (
 # ドメインオブジェクトを定義する
 
 class OrderItem:
-    def __init__(self, id, product, quanity, size):
+    def __init__(self, id, product, quantity, size):
         self.id = id
         self.product = product
-        self.quantity = quanity
+        self.quantity = quantity
         self.size = size
 
     def dict(self):
