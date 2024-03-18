@@ -2,7 +2,7 @@ import requests
 
 from orders.orders_service.exceptions import (
     APIIntegrationError,
-    InvalidActionError
+    InvalidAction
 )
 
 
@@ -15,6 +15,12 @@ class OrderItem:
         self.quantity = quanity
         self.size = size
 
+    def dict(self):
+        return {
+            'product': self.product,
+            'size': self.size,
+            'quantity': self.quantity
+        }
 
 class Order:
     """注文クラス
@@ -72,7 +78,7 @@ class Order:
         
         # 配達中の注文のキャンセルは許可しない
         if self.status == "delivery":
-            raise InvalidActionError(
+            raise InvalidAction(
                 f"Cannot cancel order with id {self.id}"
             )
             
@@ -98,3 +104,11 @@ class Order:
         raise APIIntegrationError(
             f"Could not schedule order with id {self.id}"
         )
+    
+    def dict(self):
+        return {
+            'id': self.id,
+            'order': [item.dict() for item in self.items],
+            'status': self.status,
+            'created': self.created,
+        }

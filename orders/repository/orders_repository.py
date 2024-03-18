@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from orders.Web.api.schemas import OrderItemSchema
 
-class OrdersRepositry:
+class OrdersRepository:
     
     def __init__(self, session: Session):
         self.session = session

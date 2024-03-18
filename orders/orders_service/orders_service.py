@@ -1,12 +1,12 @@
 from uuid import UUID
 from orders.orders_service.exceptions import OrderNotFoundError
 from orders.orders_service.orders import Order
-from repository.orders_repository import OrdersRepositry
+from orders.repository.orders_repository import OrdersRepository
 
 from orders.Web.api.schemas import OrderItemSchema
 
 class OrdersService:
-    def __init__(self, orders_repository: OrdersRepositry):
+    def __init__(self, orders_repository: OrdersRepository):
         self.orders_repository = orders_repository
     
     
@@ -16,7 +16,7 @@ class OrdersService:
         return self.orders_repository.add(items=items)
     
     def get_order(self, order_id: str):
-        order = self.orders_repository.get(order_id=order_id)
+        order: Order = self.orders_repository.get(order_id=order_id)
         if order is not None:
             return order
         raise OrderNotFoundError(f"Order with id {order_id} not found")
@@ -53,3 +53,10 @@ class OrdersService:
         
         order.cancel()
         return self.orders_repository.update(order_id, status="canceled")
+    
+    
+    def delete_order(self, order_id):
+        order = self.orders_repository.get(order_id)
+        if order is None:
+            raise OrderNotFoundError(f'Order with id {order_id} not found')
+        return self.orders_repository.delete(order_id)
