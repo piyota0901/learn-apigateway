@@ -1,0 +1,65 @@
+services:
+  kong-database:
+    image: postgres:13
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kong"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    networks:
+      - kong-net
+    expose:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_DB: kong
+      POSTGRES_PASSWORD: kongpass
+
+  kong-migrations:
+    image: kong/kong-gateway:3.6.1.1
+    command: kong migrations bootstrap
+    networks:
+      - kong-net
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_PASSWORD: kongpass
+      KONG_PASSWORD: test
+    depends_on:
+      kong-database:
+        condition: service_healthy
+
+  kong-gateway:
+    image: kong/kong-gateway:3.6.1.1
+    networks:
+      - kong-net
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+      - "8002:8002"
+    expose:
+      - "8443:8443"
+      - "8444:8444"
+      - "8445:8445"
+      - "8003:8003"
+      - "8004:8004"
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kongpass
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_ADMIN_GUI_URL: http://localhost:8002
+      KONG_LICENSE_DATA: 
+    depends_on:
+      kong-migrations:
+        condition: service_completed_successfully
+      kong-database:
+        condition: service_healthy
+
+networks:
+  kong-net:

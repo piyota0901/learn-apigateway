@@ -74,3 +74,79 @@ SQLAlcheyｍの`Session`オブジェクトは、データベーストランザ�
 
 ### SQLAlchemy
 - `mapped_column()`は、`nullable=True`としないとデフォルトで`False`が設定されてしまう
+
+#### カスケード設定
+
+`delete-orphan`とする。理由は以下。
+- 注文が削除されれば、注文のアイテムも削除される  
+- 注文のアイテムが単独で存在することはない
+
+
+`delete`と`delete-orphan`がある。  
+`relationship()`は、親オブジェクトに記載する。
+
+- `delete`: 親オブジェクトが削除されたときのみ子オブジェクトが削除される
+- `delete-orphan`: 親オブジェクトが削除されたとき + 親オブジェクトから関連付けを削除されたときにも削除される
+- `save-update`: 親オブジェクトがSessionに加えられた場合、`relationship`で関連するオブジェクトも同じSessionに入れられる。
+- `backref`: 双方向のリレーションを自動的に結んでくれる
+- `back_populates`: 双方向リレーションを手動で設定する必要がある ※populate: 投入する
+    ```python
+    class Event(Base):
+    __tablename__ = ‘event’
+    id = Column(Integer, primary_key=True)
+    title = Column(String(255))
+    tickets = relationship("Ticket",back_populates="event")
+    
+    class Ticket(Base):
+        __tablename__ = ‘ticket’
+        id = Column(Integer,primary_key=True)
+        title = Column(String(255))
+        value = Column(Integer)
+        event_id = Column(Integer,ForeignKey(‘event.id’))
+        event = relationship("Event",back_populates="tickets")
+
+    event = Event(title="test")
+    ticket = Ticket(title="test_ticket",value=5000)
+    # ↓ 手動でeventのticketsプロパティに設定する必要がある
+    event.tickets = [ticket] event.tickets #Ticket Objects
+    ticket.event #Event Object
+    ```
+- `backref`, `back_populates`のどちらも指定しない場合、トランザクション内で紐づかない
+    - トランザクション内
+        ```python
+        event.tickets = [ticket] event.tickets #Ticket Objects
+        ticket.event #None ← 紐づいていない
+        ```
+    - トランザクション後
+        ```python
+        event = self.session.query(Event).filter(Event.id==1).one()
+        ticket = self.session.query(Ticket).filter(Ticket.id==1).one()
+        event.tickets #Ticket Objects
+        ticket.event #Event Object  ← 紐づいている
+        ```
+
+## GraphQL
+
+GraphQLは単一のエンドポイントを持つ。操作（Query / Mutation）にかかわらず一定。（例. http://xxx.xxx.xxx/graphql）  
+リクエスト送信は、GETまたはPOSTメソッド。  
+- GET: URLクエリパラメータにクエリを追加
+- POST: リクエストペイロードにクエリを追加
+
+### Mockサーバー
+[graphql-faker | Usage Docker](https://github.com/graphql-kit/graphql-faker?tab=readme-ov-file#usage-with-docker)
+
+## Kong
+
+## JWT Plugin
+
+[Kong | JWT Plugin](https://docs.konghq.com/hub/kong-inc/jwt/)
+
+[JWT Debugger](https://jwt.io/#:~:text=SEE%20JWT%20LIBRARIES-,Debugger,-Warning%3A%20JWTs)
+    - 参考: https://qiita.com/ike_dai/items/5a14ced48c6ec7d80d70
+    - `secret base64 encoded`はチェックしない。エンコードされた値ではないため
+    - 参考: https://future-architect.github.io/articles/20221006a/
+
+## APIモックサーバー
+
+[httpbin.org](https://httpbin.org/)というサイトがある。  
+[httpbun.com](https://httpbun.com)というサイトもある。`httpbin`の改良。
