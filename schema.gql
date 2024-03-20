@@ -1,0 +1,153 @@
+scalar Datetime
+
+enum Sizes {
+    SMALL
+    MEDIUM
+    LARGE
+}
+
+interface ProductInterface {
+    id: ID!
+    name: String!
+    price: Float
+    size: Sizes
+    ingredients: [IngredientRecipe!]!
+    avaliable: Boolean!
+    lastUpdated: Datetime!
+}
+
+enum MeasureUnit {
+    LITERS
+    KILOGRAMS
+    UNITS
+}
+
+# スルー型
+type IngredientRecipe {
+    ingredient: Ingredient!
+    quantity: Float!
+    unit: MeasureUnit!
+}
+
+type Cake implements ProductInterface {
+    id: ID!
+    name: String!
+    price: Float
+    size: Sizes
+    avaliable: Boolean!
+    hasFillings: Boolean! # Cake型に固有のフィールド
+    hasNutsToppingOption: Boolean!
+    lastUpdated: Datetime!
+    ingredients: [IngredientRecipe!]!
+}
+
+type Beverage implements ProductInterface {
+    id: ID!
+    name: String!
+    price: Float
+    size: Sizes
+    avaliable: Boolean!
+    lastUpdated: Datetime!
+    hasCreamOnTopOption: Boolean!
+    hasServeOnIceOption: Boolean!
+    ingredients: [IngredientRecipe!]!
+}
+
+# Beverage型とCake型のユニオンを作成
+union Product = Cake | Beverage
+
+type Stock {
+    quantity: Float!
+    unit: MeasureUnit!
+}
+
+type Ingredient {
+    id: ID!
+    name: String!
+    stock: Stock!
+    products: [Product!]!
+    supplier: Supplier!
+    description: [String!]
+    lastUpdated: Datetime!
+}
+
+type Supplier {
+    id: ID!
+    name: String!
+    address: String!
+    contactNumber: String!
+    email: String!
+    ingredients: [Ingredient!]!
+}
+
+# ---------------------
+# Query
+# ---------------------
+enum SortringOrder {
+    ASCENDING
+    DESCENDING
+}
+
+enum SortBy {
+    price
+    name
+}
+
+input ProductsFilter {
+    maxPrice: Float
+    minPrice: Float
+    avaliable: Boolean = true
+    sortBy: SortBy = price
+    sort: SortringOrder = DESCENDING
+    resultsPerPage: Int = 10
+    page: Int = 1
+}
+
+type Query {
+    allProducts: [Product!]!
+    allIngredients: [Ingredient!]!
+    products(input: ProductsFilter!): [Product!]!
+    product(id: ID!): Product
+    ingredient(id: ID!): Ingredient
+}
+
+# ---------------------
+# Mutation
+# ---------------------
+enum ProductType {
+    cake
+    beverage
+}
+
+input IngredientRecipeInput {
+    ingredientId: ID!
+    quantity: Float!
+    unit: MeasureUnit!
+}
+
+input AddProductInput {
+    price: Float,
+    size: Sizes,
+    ingredients: [IngredientRecipeInput!]!,
+    hasFillings: Boolean = false,
+    hasNutsToppingOption: Boolean = false,
+    hasCreamOnTopOption: Boolean = false,
+    hasServeOnIceOption: Boolean = false
+}
+
+type Mutation {
+    addProduct(
+        name: String!,
+        type: ProductType!,
+        input: AddProductInput!
+    ): Product!
+
+    updateProduct(
+        id: ID!,
+        input: AddProductInput!
+    ): Product!
+
+    deleteProduct(
+        id: ID!
+    ): Boolean!
+}
