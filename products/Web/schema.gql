@@ -12,7 +12,7 @@ interface ProductInterface {
     price: Float
     size: Sizes
     ingredients: [IngredientRecipe!]!
-    avaliable: Boolean!
+    available: Boolean!
     lastUpdated: Datetime!
 }
 
@@ -34,7 +34,7 @@ type Cake implements ProductInterface {
     name: String!
     price: Float
     size: Sizes
-    avaliable: Boolean!
+    available: Boolean!
     hasFillings: Boolean! # Cake型に固有のフィールド
     hasNutsToppingOption: Boolean!
     lastUpdated: Datetime!
@@ -46,7 +46,7 @@ type Beverage implements ProductInterface {
     name: String!
     price: Float
     size: Sizes
-    avaliable: Boolean!
+    available: Boolean!
     lastUpdated: Datetime!
     hasCreamOnTopOption: Boolean!
     hasServeOnIceOption: Boolean!
@@ -96,7 +96,7 @@ enum SortBy {
 input ProductsFilter {
     maxPrice: Float
     minPrice: Float
-    avaliable: Boolean = true
+    available: Boolean = true
     sortBy: SortBy = price
     sort: SortringOrder = DESCENDING
     resultsPerPage: Int = 10

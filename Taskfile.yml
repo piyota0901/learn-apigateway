@@ -47,4 +47,4 @@ tasks:
 
   run:graphql-faker:
     cmds:
-      - docker run -v=${PWD}:/workdir -p=9002:9002 -d apisguru/graphql-faker /workdir/schema.gql
+      - cd products && docker run -v=${PWD}:/workdir -p=9002:9002 -d apisguru/graphql-faker /workdir/schema.gql
