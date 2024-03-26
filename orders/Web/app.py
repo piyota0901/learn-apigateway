@@ -49,7 +49,7 @@ class AuthorizeRequestMiddleware(BaseHTTPMiddleware):
             request.state.user_id = "test"
             return await call_next(request)
     
-        if request.url.path in ["docs/orders", "openapi/orders.json"]:
+        if request.url.path in ["/docs/orders", "/openapi/orders.json"]:
             return await call_next(request)
         
         if request.method == "OPTIONS": # CORS preflight requestは認証をスキップ
@@ -91,8 +91,10 @@ class AuthorizeRequestMiddleware(BaseHTTPMiddleware):
 app.add_middleware(AuthorizeRequestMiddleware)        
         
 origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
     "http://localhost:8000",
-    "http://127.0.0.1:8000"
+    "http://127.0.0.1:8000",
 ]
 
 app.add_middleware(

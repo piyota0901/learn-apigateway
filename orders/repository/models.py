@@ -21,6 +21,7 @@ class OrderModel(Base):
     __tablename__ = "order"
     
     id: Mapped[str] = mapped_column(primary_key=True, default=generate_uuid)
+    user_id: Mapped[str] = mapped_column(nullable=False)
     items: Mapped[List["OrderItemModel"]] = relationship(backref="order", cascade="all, delete-orphan")
     status: Mapped[str] = mapped_column(nullable=False, default="created")
     created: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now(timezone.utc))

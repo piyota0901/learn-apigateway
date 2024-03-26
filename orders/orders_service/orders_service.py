@@ -10,19 +10,19 @@ class OrdersService:
         self.orders_repository = orders_repository
     
     
-    def place_order(self, items: list[OrderItemSchema]):
+    def place_order(self, items: list[OrderItemSchema], user_id: str):
         """注文する
         """
-        return self.orders_repository.add(items=items)
+        return self.orders_repository.add(items=items, user_id=user_id)
     
-    def get_order(self, order_id: str):
-        order: Order = self.orders_repository.get(id_=order_id)
+    def get_order(self, order_id: str, **filters):
+        order: Order = self.orders_repository.get(id_=order_id, **filters)
         if order is not None:
             return order
         raise OrderNotFoundError(f"Order with id {order_id} not found")
     
-    def update_order(self, order_id: str, **payload):
-        order = self.orders_repository.get(id_=order_id)
+    def update_order(self, order_id: str, user_id: str, **payload):
+        order = self.orders_repository.get(id_=order_id, user_id=user_id)
         if order is None:
             raise OrderNotFoundError(f"Order with id {order_id} not found")
         return self.orders_repository.update(order_id, **payload)
@@ -31,8 +31,8 @@ class OrdersService:
         limit = filters.pop("limit", None)
         return self.orders_repository.list(limit, **filters)
     
-    def pay_order(self, order_id: str):
-        order: Order = self.orders_repository.get(id_=order_id)
+    def pay_order(self, order_id: str, user_id: str):
+        order: Order = self.orders_repository.get(id_=order_id, user_id=user_id)
         if order is None:
             raise OrderNotFoundError(f"Order with id {order_id} not found")
         
@@ -45,8 +45,8 @@ class OrdersService:
             schedule_id=schedule_id
         )
     
-    def cancel_order(self, order_id: str):
-        order = self.orders_repository.get(id_=order_id)
+    def cancel_order(self, order_id: str, user_id: str):
+        order = self.orders_repository.get(id_=order_id, user_id=user_id)
         if order is None:
             raise OrderNotFoundError(f"Order with id {order_id} not found")
         
@@ -54,8 +54,8 @@ class OrdersService:
         return self.orders_repository.update(order_id, status="canceled")
     
     
-    def delete_order(self, order_id):
-        order = self.orders_repository.get(id_=order_id)
+    def delete_order(self, order_id:str, user_id:str):
+        order = self.orders_repository.get(id_=order_id, user_id=user_id)
         if order is None:
             raise OrderNotFoundError(f'Order with id {order_id} not found')
         return self.orders_repository.delete(order_id)

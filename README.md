@@ -173,3 +173,10 @@ GraphQLは単一のエンドポイントを持つ。操作（Query / Mutation）
 OAuthのフロー  
 クライアントアプリケーションがAPIへのアクセスを認可するために用いる戦略。  
 ベストプラクティスは[OAuth 2.0 Security Best Current Practice](https://oauth.net/2/oauth-best-practice/)で説明されている。  
+
+
+## Frontend
+
+- `Typescript`で`import path from path`でエラーが出たら・・・
+    - `npm i @types/node -D`を実行してインストールする。
+[`Tailwindcss`](https://tailwindcss.com/docs/installation) + [`DaisyUI`](https://daisyui.com/docs/install/)

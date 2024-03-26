@@ -10,20 +10,22 @@ class OrdersRepository:
     def __init__(self, session: Session):
         self.session = session
         
-    def add(self, items: list[OrderItemSchema]):
-        record = OrderModel(items=[OrderItemModel(**item) for item in items])
+    def add(self, items: list[OrderItemSchema], user_id: str):
+        record = OrderModel(items=[OrderItemModel(**item) for item in items],
+                            user_id=user_id
+                            )
         self.session.add(record)
         return Order(**record.dict(), order_=record)
     
-    def _get(self, id_: str):
+    def _get(self, id_: str, **filters):
         return (
             self.session.query(OrderModel)
-            .filter(OrderModel.id == str(id_))
+            .filter(OrderModel.id == str(id_)).filter_by(**filters)
             .first()
         )
     
-    def get(self, id_: str):
-        order = self._get(id_)
+    def get(self, id_: str, **filters):
+        order = self._get(id_,**filters)
         if order is not None:
             return Order(**order.dict())
     
@@ -37,7 +39,7 @@ class OrdersRepository:
             else:
                 query = query.filter(OrderModel.status != "cancelled")
         
-        records = query.filter(**filters).limit(limit).all()
+        records = query.filter_by(**filters).limit(limit).all()
         return [Order(**record.dict()) for record in records]
     
     

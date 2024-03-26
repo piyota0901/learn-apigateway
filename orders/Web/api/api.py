@@ -5,6 +5,7 @@ import uuid
 
 from fastapi import HTTPException
 from starlette.responses import Response
+from starlette.requests import Request
 from starlette import status
 
 from orders.Web.app import app
@@ -24,11 +25,15 @@ from orders.Web.api.schemas import (
 
 
 @app.get("/orders", response_model=GetOrdersSchema)
-def get_orders(cancelled: Optional[bool]=None, limit: Optional[int]=None):
+def get_orders(
+    request: Request,
+    cancelled: Optional[bool]=None, 
+    limit: Optional[int]=None
+    ):
     with UnitOfWork() as uow:
         repo = OrdersRepository(session=uow.session)
         orders_service = OrdersService(orders_repository=repo)
-        results = orders_service.list_orders(limit=limit, cancelled=cancelled)
+        results = orders_service.list_orders(limit=limit, cancelled=cancelled, user_id=request.state.user_id)
         
         for result in results:
             print("result: ", result.dict())
@@ -39,7 +44,10 @@ def get_orders(cancelled: Optional[bool]=None, limit: Optional[int]=None):
     status_code=status.HTTP_201_CREATED,
     response_model=GetOrderSchema
     )
-def create_order(payload: CreateOrderSchema):
+def create_order(
+    request: Request,
+    payload: CreateOrderSchema
+    ):
     with UnitOfWork() as uow:
         repo = OrdersRepository(session=uow.session)
         orders_service = OrdersService(orders_repository=repo)
@@ -48,18 +56,24 @@ def create_order(payload: CreateOrderSchema):
             item["size"] = item["size"].value
         
         # 注文を実行
-        order: Order = orders_service.place_order(items=order)
+        order: Order = orders_service.place_order(items=order, user_id=request.state.user_id)
         uow.commit()
         return_payload = order.dict()
         return return_payload
 
 @app.get("/orders/{order_id}", response_model=GetOrderSchema)
-def get_order(order_id: UUID):
+def get_order(
+    request: Request,
+    order_id: UUID
+    ):
     try:
         with UnitOfWork() as uow:
             repo = OrdersRepository(session=uow.session)
             orders_service = OrdersService(orders_repository=repo)
-            order = orders_service.get_order(order_id)
+            order = orders_service.get_order(
+                                    order_id=order_id,
+                                    user_id=request.state.user_id
+                                    )
             return order.dict()
     except OrderNotFoundError:
         raise HTTPException(
@@ -67,7 +81,11 @@ def get_order(order_id: UUID):
         )
 
 @app.put("/orders/{order_id}", response_model=GetOrderSchema)
-def update_order(order_id: UUID, order_details: CreateOrderSchema):
+def update_order(
+    request: Request,
+    order_id: UUID, 
+    order_details: CreateOrderSchema
+    ):
     try:
         with UnitOfWork() as uow:
             repo = OrdersRepository(session=uow.session)
@@ -75,7 +93,11 @@ def update_order(order_id: UUID, order_details: CreateOrderSchema):
             order = order_details.model_dump()["order"]
             for item in order:
                 item["size"] = item["size"].value
-            order = orders_service.update_order(order_id=order_id, items=order)
+            order = orders_service.update_order(
+                            order_id=order_id, 
+                            items=order, 
+                            user_id=request.state.user_id
+                    )
             uow.commit()
         return order.dict()
     
@@ -89,12 +111,15 @@ def update_order(order_id: UUID, order_details: CreateOrderSchema):
     status_code=status.HTTP_204_NO_CONTENT,
     response_class=Response
 )
-def delete_order(order_id: UUID):
+def delete_order(
+    request: Request,
+    order_id: UUID
+    ):
     try:
         with UnitOfWork() as uow:
             repo = OrdersRepository(session=uow.session)
             orders_service = OrdersService(orders_repository=repo)
-            orders_service.delete_order(order_id=order_id)
+            orders_service.delete_order(order_id=order_id, user_id=request.state.user_id)
             uow.commit()
         return 
     except OrderNotFoundError:
@@ -103,12 +128,15 @@ def delete_order(order_id: UUID):
         )
 
 @app.post("/orders/{order_id}/cancel", response_model=GetOrderSchema)
-def cancel_order(order_id: UUID):
+def cancel_order(
+    request: Request,
+    order_id: UUID
+    ):
     try:
         with UnitOfWork() as uow:
             repo = OrdersRepository(session=uow.session)
             orders_service = OrdersService(orders_repository=repo)
-            order = orders_service.cancel_order(order_id)
+            order = orders_service.cancel_order(order_id=order_id, user_id=request.state.user_id)
             uow.commit()
         return order.dict()
     except OrderNotFoundError:
@@ -117,12 +145,15 @@ def cancel_order(order_id: UUID):
         )
 
 @app.post("/orders/{order_id}/pay", response_model=GetOrderSchema)
-def pay_order(order_id: UUID):
+def pay_order(
+    request: Request,
+    order_id: UUID
+    ):
     try:
         with UnitOfWork() as uow:
             repo = OrdersRepository(session=uow.session)
             orders_service = OrdersService(orders_repository=repo)
-            order = orders_service.pay_order(order_id)
+            order = orders_service.pay_order(order_id=order_id, user_id=request.state.user_id)
             uow.commit()
         return order.dict()
     except OrderNotFoundError:
