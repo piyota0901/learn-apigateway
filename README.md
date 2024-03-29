@@ -180,3 +180,44 @@ OAuthのフロー
 - `Typescript`で`import path from path`でエラーが出たら・・・
     - `npm i @types/node -D`を実行してインストールする。
 [`Tailwindcss`](https://tailwindcss.com/docs/installation) + [`DaisyUI`](https://daisyui.com/docs/install/)
+
+
+## トラブルシューティング
+
+- `/mypage`でブラウザをリロードしたら、orders APIに対して`401 Unauthorized`が発生した。tokenは問題ない
+    - 調査： 
+        - ブラウザの開発者モードを起動
+        - `response`のdataを確認する。← fastAPI側で以下のように実装しているから
+            ```python
+            return JSONResponse(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                content={
+                    "detail": str(error),
+                    "body": str(error)
+                }
+            )
+            ```
+        - エラーメッセージ: `{\"detail\":\"The token is not yet valid (iat)\",\"body\":\"The token is not yet valid (iat)\"}`
+        - `iat`は`Issued At Time`の略。JWTが発行された日時を意味する。
+        - 未来の日時となっているためにエラーとなっている様子。
+        - API側の問題（JWT検証時の問題）なのでpythonの`datetime.now()`と比較してみた
+        ```bash
+        iat: 2024-03-29 15:11:16 
+        now: 2024-03-29 15:11:12.986352
+        ```
+        - 原因：4秒ほど遅れている
+    - 解消方法
+        - wslで時刻同期しても、元のWindowsが遅れていたため、Windowsの時刻同期⇒WSlの時刻同期となる。
+        - Windowsの時刻同期方法
+            ```md
+            1. スタートメニューを開き、「設定」をクリックします。
+            2. 「時間と言語」をクリックします。
+            3. 「日付と時刻」をクリックします。
+            4. 「自動的に日付と時刻を設定する」をオンにします。また、「自動的にタイムゾーンを設定する」もオンにすることをお勧めします。
+            5. 「今すぐ同期する」ボタンをクリックします。
+            ```
+        - WSLの時刻同期
+            ```bash
+            sudo timedatectl set-ntp on
+            ```
+

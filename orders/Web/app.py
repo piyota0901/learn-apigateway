@@ -10,6 +10,7 @@ from jwt import (
     ImmatureSignatureError,
     InvalidAlgorithmError,
     InvalidAudienceError,
+    InvalidIssuedAtError,
     InvalidKeyError,
     InvalidTokenError,
     InvalidSignatureError,
@@ -75,8 +76,9 @@ class AuthorizeRequestMiddleware(BaseHTTPMiddleware):
             InvalidKeyError,
             InvalidTokenError,
             InvalidSignatureError,
-            MissingRequiredClaimError
+            MissingRequiredClaimError,
         ) as error:
+            print(type(error), error)
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 content={

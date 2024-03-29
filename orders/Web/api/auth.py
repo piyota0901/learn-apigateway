@@ -27,6 +27,9 @@ def decode_and_validate_token(access_token):
     unverified_header = jwt.get_unverified_header(access_token)
     x509_cetificate = _get_certificate_for_kid(unverified_header["kid"])
     publick_key = load_public_key_from_x509_cert(X509_CERT_TEMPLATE.format(key=x509_cetificate).encode("utf-8"))
+    from datetime import datetime
+    print("iat: ", datetime.fromtimestamp(jwt.decode(access_token, options={"verify_signature": False})["iat"]))
+    print("now: ", datetime.now())
     
     return jwt.decode(
         access_token,

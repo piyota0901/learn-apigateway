@@ -6,7 +6,7 @@ export interface OrderItem {
 
 export interface Order {
   id: String;
-  items: OrderItem[];
+  order: OrderItem[];
   created: Date;
   status: String;
 }

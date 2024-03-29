@@ -12,7 +12,12 @@ const handleLogout = async () => {
 }
 
 const handleLogin = async () => {
-  await loginWithRedirect();
+  await loginWithRedirect({
+    appState: {
+      targetUrl: "/mypage"
+    }
+  });
+  console.log("Login successful")
 }
 </script>
 <template>
