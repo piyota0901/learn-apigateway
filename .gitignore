@@ -1,5 +1,8 @@
 # Additonal settings
 .python-version
+public_key.pem
+private_key.pem
+auth.py.old
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
