@@ -4,7 +4,9 @@ import Footer from '@/components/Footer.vue'
 </script>
 <template>
   <Header />
-  <router-view></router-view>
+  <div class="main">
+    <router-view></router-view>
+  </div>
   <Footer />
 </template>
 <style scoped>
@@ -21,4 +23,6 @@ footer {
   bottom: 0;
   width: 100%;
 }
+
+/* mainをHeaderとFooterの間にしたい */
 </style>

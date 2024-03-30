@@ -10,3 +10,15 @@ export interface Order {
   created: Date;
   status: String;
 }
+
+export enum Size {
+  Small = 'Small',
+  Medium = 'Medium',
+  Large = 'Large'
+}
+
+export interface Product {
+  product: String;
+  sizes: Size[];
+  quantity: Number;
+}

@@ -27,7 +27,7 @@ const handleLogin = async () => {
       <div class="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1 text-white">
           <li>
-            <router-link to="/about">About</router-link>
+            <router-link to="/menu">Menu</router-link>
           </li>
           <li>
             <a>Item 2</a>

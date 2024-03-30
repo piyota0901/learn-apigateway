@@ -3,6 +3,7 @@ import { useAuth0 } from '@auth0/auth0-vue'
 import { ref, onBeforeMount } from 'vue'
 import { Order } from '@/interfaces'
 import axios from 'axios'
+import OrderDetalDialog from '@/components/OrderDetailDialog.vue'
 
 const { getAccessTokenSilently } = useAuth0()
 const orders = ref<Order[]>([])
@@ -22,20 +23,25 @@ const getOrders = async () => {
   } else {
     console.error("Unexpected response:", response.data)
   }
+  console.log(orders.value)
 }
 
 onBeforeMount(() => {
   getOrders()
 })
 
-const showModal = () => {
-  const dialog = document.getElementById('order-details') as HTMLDialogElement;
+const selectedOrder = ref<Order>();
+
+const showModal = (order: Order) => {
+  selectedOrder.value = order;
+  const dialog = document.getElementById('order-detail') as HTMLDialogElement;
   dialog.showModal();
-}
+};
 
 const dateToString = (date: Date) => {
   return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
 }
+
 </script>
 <template>
   <div class="overflow-x-auto" id="order-table">
@@ -56,26 +62,13 @@ const dateToString = (date: Date) => {
       <template v-else v-for="order in orders" :key="order.id">
         <tbody>
           <tr>
-            <th>{{ orders.indexOf(order) }}</th>
+            <th>{{ orders.indexOf(order) + 1 }}</th>
             <th>{{ dateToString(order.created) }}</th>
             <th>{{ order.status }}</th>
             <th>
-              <button class="btn" @click="showModal">詳細</button>
-              <dialog id="order-details" class="modal">
-                <div class="modal-box">
-                  <h2 class="font-bold ">注文詳細</h2>
-                  <div class="divider"></div>
-                  <div v-for="item in order.order" :key="order.order.indexOf(item)">
-                    <p>商品名: {{ item.product }}</p>
-                    <p>サイズ: {{ item.size }}</p>
-                    <p>数量: {{ item.quantity }}</p>
-                  </div>
-                  <div class="modal-action">
-                    <form method="dialog">
-                      <button class="btn">Close</button>
-                    </form>
-                  </div>
-                </div>
+              <button class="btn" @click="showModal(order)">詳細</button>
+              <dialog class="modal" id="order-detail">
+                <OrderDetalDialog :order="selectedOrder" />
               </dialog>
             </th>
           </tr>
