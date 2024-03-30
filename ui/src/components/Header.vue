@@ -13,12 +13,10 @@ const handleLogout = async () => {
 
 const handleLogin = async () => {
   await loginWithRedirect({
-    appState: {
-      targetUrl: "/mypage"
-    }
+    appState: { target: "/account" }
   });
-  console.log("Login successful")
 }
+
 </script>
 <template>
   <header>
@@ -35,7 +33,7 @@ const handleLogin = async () => {
             <a>Item 2</a>
           </li>
           <li>
-            <router-link to="/mypage">My Page</router-link>
+            <router-link to="/account">My Page</router-link>
           </li>
         </ul>
       </div>

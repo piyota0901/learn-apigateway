@@ -8,6 +8,7 @@ const name = user.value?.name
 </script>
 <template>
   <h1>{{ name }}</h1>
+  <div class="divider"></div>
   <OrderTable />
 </template>
 <style scoped></style>

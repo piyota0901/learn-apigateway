@@ -3,48 +3,48 @@
 version: "3"
 
 vars:
-  GREETING: Hello, World!
+    GREETING: Hello, World!
 
 tasks:
-  default:
-    cmds:
-      - echo "{{.GREETING}}"
-    silent: true
+    default:
+        cmds:
+            - echo "{{.GREETING}}"
+        silent: true
 
-  clean:
-    cmds:
-      - find . -type d -name __pycache__ -exec rm -r {} +
-    silent: true
+    clean:
+        cmds:
+            - find . -type d -name __pycache__ -exec rm -r {} +
+        silent: true
 
-  python:
-    cmds:
-      - poetry run python
-    silent: true
+    python:
+        cmds:
+            - poetry run python
+        silent: true
 
-  run:orders:
-    cmds:
-      - poetry run uvicorn orders.Web.app:app --reload
-    silent: true
+    run:orders:
+        cmds:
+            - poetry run uvicorn orders.Web.app:app --reload --log-level=debug --access-log
+        silent: true
 
-  run:swagger-editor:
-    cmds:
-      - docker run -p 80:8080 -v $(pwd):/tmp -e SWAGGER_FILE=/tmp/oas.yaml swaggerapi/swagger-editor
-    silent: true
+    run:swagger-editor:
+        cmds:
+            - docker run -p 80:8080 -v $(pwd):/tmp -e SWAGGER_FILE=/tmp/oas.yaml swaggerapi/swagger-editor
+        silent: true
 
-  run:prism:kitchen:
-    cmds:
-      - docker run --init -d --rm -v ${PWD}/kitchen:/tmp -p 3000:3000 stoplight/prism:4 mock --port 3000 -h 0.0.0.0 "/tmp/oas.yaml"
-    silent: true
+    run:prism:kitchen:
+        cmds:
+            - docker run --init -d --rm -v ${PWD}/kitchen:/tmp -p 3000:3000 stoplight/prism:4 mock --port 3000 -h 0.0.0.0 "/tmp/oas.yaml"
+        silent: true
 
-  run:prism:payments:
-    cmds:
-      - docker run --init -d --rm -v ${PWD}/payments:/tmp -p 3001:3001 stoplight/prism:4 mock --port 3001 -h 0.0.0.0 "/tmp/oas.yaml"
-    silent: true
+    run:prism:payments:
+        cmds:
+            - docker run --init -d --rm -v ${PWD}/payments:/tmp -p 3001:3001 stoplight/prism:4 mock --port 3001 -h 0.0.0.0 "/tmp/oas.yaml"
+        silent: true
 
-  run:kitchen:
-    cmds:
-      - cd kitchen && poetry run flask run --reload
+    run:kitchen:
+        cmds:
+            - cd kitchen && poetry run flask run --reload
 
-  run:graphql-faker:
-    cmds:
-      - cd products && docker run -v=${PWD}:/workdir -p=9002:9002 -d apisguru/graphql-faker /workdir/schema.gql
+    run:graphql-faker:
+        cmds:
+            - cd products && docker run -v=${PWD}:/workdir -p=9002:9002 -d apisguru/graphql-faker /workdir/schema.gql
